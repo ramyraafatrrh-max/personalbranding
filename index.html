@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Brand Discovery</title>
+  <meta name="description" content="Personal brand and LinkedIn profile assessment tool created by Ramy Habib." />
+
+  <style>
+    :root {
+      --bg: #05050a;
+      --card: rgba(255,255,255,.075);
+      --card2: rgba(255,255,255,.11);
+      --line: rgba(255,255,255,.13);
+      --gold: #f7d774;
+      --gold2: rgba(247,215,116,.16);
+      --violet: #8b5cf6;
+      --cyan: #68e1fd;
+      --green: #6ee7b7;
+      --red: #fb7185;
+      --text: #fff;
+      --muted: #b8c0d4;
+      --muted2: #8790a6;
+      --black: #060608;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(139,92,246,.34), transparent 32%),
+        radial-gradient(circle at top right, rgba(247,215,116,.28), transparent 30%),
+        radial-gradient(circle at bottom, rgba(104,225,253,.10), transparent 35%),
+        linear-gradient(135deg, #05050a, #101421 54%, #030303);
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1220px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 44px; }
+
+    .nav { display:flex; justify-content:space-between; align-items:center; gap:18px; margin-bottom: 44px; }
+    .logo-wrap { display:flex; align-items:center; gap:14px; }
+    .logo { width:52px; height:52px; border-radius:18px; display:grid; place-items:center; background:linear-gradient(135deg,var(--gold),var(--violet)); color:#080808; font-size:26px; font-weight:900; box-shadow:0 18px 45px rgba(139,92,246,.28); }
+    .nav-title { margin:0; font-size:22px; letter-spacing:-.03em; }
+    .nav-subtitle { margin:3px 0 0; color:var(--muted); font-size:13px; }
+    .signature-top { color:var(--muted); font-size:14px; }
+    .signature-top a, footer a { color:var(--gold); font-weight:900; border-bottom:1px solid rgba(247,215,116,.48); }
+
+    .hero { text-align:left; margin-bottom:30px; }
+    .hero h1 { margin:0; max-width:930px; font-size:clamp(42px,6vw,78px); line-height:.96; letter-spacing:-.06em; }
+    .hero p { max-width:800px; margin:20px 0 0; color:var(--muted); font-size:18px; line-height:1.65; }
+    .choice-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin: 30px 0 10px; }
+    .choice-card { border:1px solid var(--line); background:linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.045)); border-radius:32px; padding:28px; min-height:250px; box-shadow:0 24px 80px rgba(0,0,0,.28); backdrop-filter:blur(18px); position:relative; overflow:hidden; }
+    .choice-card:before { content:""; position:absolute; inset:auto -20% -45% -20%; height:140px; background:radial-gradient(circle, rgba(247,215,116,.18), transparent 65%); }
+    .choice-icon { width:58px; height:58px; border-radius:22px; display:grid; place-items:center; background:var(--gold2); color:var(--gold); font-size:27px; margin-bottom:18px; }
+    .choice-card h2 { margin:0; font-size:28px; letter-spacing:-.04em; }
+    .choice-card p { color:var(--muted); line-height:1.55; margin:10px 0 22px; }
+
+    .btn { border:0; border-radius:18px; padding:14px 17px; cursor:pointer; font-weight:950; font-size:14px; transition:transform .16s ease, opacity .16s ease, background .16s ease; }
+    .btn:hover { opacity:.95; transform:translateY(-1px); }
+    .btn-primary { color:#080808; background:linear-gradient(90deg,var(--gold),var(--violet)); box-shadow:0 18px 35px rgba(139,92,246,.20); }
+    .btn-ghost { color:#fff; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); }
+    .btn-wide { width:100%; margin-top:16px; }
+    .button-row { display:flex; gap:11px; flex-wrap:wrap; }
+
+    .view { display:none; animation:fade .22s ease both; }
+    .view.active { display:block; }
+    @keyframes fade { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+
+    .layout { display:grid; grid-template-columns:1.03fr .97fr; gap:24px; align-items:start; }
+    .stack { display:grid; gap:20px; }
+    .card { border:1px solid var(--line); background:var(--card); border-radius:32px; backdrop-filter:blur(18px); box-shadow:0 24px 80px rgba(0,0,0,.28); overflow:hidden; }
+    .card-inner { padding:26px; }
+    .card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:20px; }
+    .section-title { margin:0; font-size:23px; letter-spacing:-.035em; }
+    .section-kicker { margin:5px 0 0; color:var(--muted2); font-size:13px; line-height:1.5; }
+    .badge { display:inline-flex; border:1px solid rgba(247,215,116,.25); background:var(--gold2); color:#fff4bd; padding:8px 11px; border-radius:999px; font-size:12px; font-weight:900; white-space:nowrap; }
+
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .field { display:grid; gap:8px; }
+    .field.full { grid-column:1 / -1; }
+    .field label, .slider-head label, .question label { color:#dce2f2; font-size:13px; font-weight:800; }
+    input, textarea, select { width:100%; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.30); color:white; border-radius:18px; padding:13px 14px; outline:none; font:inherit; }
+    textarea { min-height:105px; resize:vertical; line-height:1.5; }
+    select option { color:#111; }
+    input:focus, textarea:focus, select:focus { border-color:rgba(247,215,116,.7); box-shadow:0 0 0 4px rgba(247,215,116,.08); }
+
+    .assessment-grid { display:grid; gap:16px; }
+    .slider-row, .question { padding:16px; border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.24); border-radius:22px; }
+    .slider-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; }
+    .score-pill { min-width:44px; text-align:center; padding:6px 10px; border-radius:999px; background:rgba(247,215,116,.17); color:var(--gold); font-weight:950; font-size:13px; }
+    input[type="range"] { accent-color:var(--gold); cursor:pointer; }
+    .hint { margin:9px 0 0; color:var(--muted2); font-size:12px; line-height:1.45; }
+    .question label { display:block; margin-bottom:8px; }
+
+    .results { position:sticky; top:20px; }
+    .score-panel { background:linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.045)), rgba(0,0,0,.18); }
+    .master-score { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; margin-bottom:20px; }
+    .master-score small { color:var(--gold); text-transform:uppercase; letter-spacing:.28em; font-size:11px; font-weight:950; }
+    .master-score strong { display:block; margin-top:6px; font-size:48px; line-height:.95; letter-spacing:-.06em; }
+    .diamond { width:68px; height:68px; border-radius:24px; display:grid; place-items:center; background:linear-gradient(135deg,var(--gold),#fff0b0); color:#090909; font-size:34px; box-shadow:0 20px 45px rgba(247,215,116,.18); }
+    .mini-scores { display:grid; grid-template-columns:repeat(3,1fr); gap:11px; margin-bottom:18px; }
+    .mini { padding:13px; border-radius:19px; border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.26); }
+    .mini span { display:block; color:var(--muted2); font-size:12px; }
+    .mini b { display:block; margin-top:4px; font-size:22px; }
+    .result-block { padding:18px; border-radius:22px; border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.27); margin-top:13px; }
+    .result-label { color:var(--gold); font-size:13px; font-weight:950; margin-bottom:8px; }
+    .result-block p, .result-block li { margin:0; color:#e5e9f5; line-height:1.55; font-size:14px; }
+    .result-block h3 { margin:0; font-size:23px; letter-spacing:-.04em; }
+    .recommendations { display:grid; gap:10px; margin-top:12px; }
+    .recommendation { display:flex; gap:10px; padding:13px; border-radius:18px; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.055); color:#e9edf7; font-size:13px; line-height:1.45; }
+    .recommendation span:first-child { color:var(--gold); font-weight:950; }
+    .note { margin-top:10px; color:var(--muted2); font-size:12px; line-height:1.5; }
+    .tools { display:grid; gap:10px; margin-top:12px; }
+    .tool-link { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px 13px; border-radius:18px; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.055); color:#fff; font-size:13px; }
+    .tool-link small { color:var(--muted2); display:block; margin-top:2px; }
+
+    footer { margin-top:34px; padding-top:22px; border-top:1px solid rgba(255,255,255,.12); display:flex; justify-content:center; color:var(--muted); font-size:14px; }
+
+    @media (max-width:980px) { .choice-grid, .layout { grid-template-columns:1fr; } .results { position:static; } }
+    @media (max-width:680px) { .nav { align-items:flex-start; flex-direction:column; } .signature-top { display:none; } .form-grid, .mini-scores { grid-template-columns:1fr; } .card-inner, .choice-card { padding:20px; } }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <nav class="nav">
+      <div class="logo-wrap">
+        <div class="logo">♛</div>
+        <div>
+          <h2 class="nav-title">Personal Brand Discovery</h2>
+          <p class="nav-subtitle">Assess your brand strength, positioning, and LinkedIn presence.</p>
+        </div>
+      </div>
+      <div class="signature-top">Created by <a href="https://www.linkedin.com/in/ramy-habib-782b803b" target="_blank" rel="noreferrer">Ramy Habib</a></div>
+    </nav>
+
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <h1>Choose what you want to assess first.</h1>
+        <p>Start with a LinkedIn profile review or discover your personal brand through a focused assessment that combines scoring and short strategic questions.</p>
+      </div>
+
+      <div class="choice-grid">
+        <article class="choice-card">
+          <div class="choice-icon">in</div>
+          <h2>Assess your LinkedIn profile</h2>
+          <p>Enter a LinkedIn URL, add profile signals, then run a structured profile assessment covering headline, About, visuals, proof, and engagement.</p>
+          <button class="btn btn-primary" onclick="showView('linkedinView')">Start LinkedIn Assessment</button>
+        </article>
+
+        <article class="choice-card">
+          <div class="choice-icon">◆</div>
+          <h2>Discover your personal brand</h2>
+          <p>Answer a premium brand assessment with a mix of numeric scoring and short questions, then generate a readiness score and action plan.</p>
+          <button class="btn btn-primary" onclick="showView('brandView')">Start Brand Discovery</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="linkedinView" class="view">
+      <div class="button-row" style="margin-bottom:18px;"><button class="btn btn-ghost" onclick="showView('homeView')">← Back</button></div>
+      <section class="layout">
+        <div class="stack">
+          <section class="card">
+            <div class="card-inner">
+              <div class="card-head">
+                <div><h2 class="section-title">LinkedIn Profile Assessment</h2><p class="section-kicker">Add the profile URL first, then click assess. For best results, paste public profile text and visible engagement metrics.</p></div>
+                <div class="badge">Profile Review</div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field full"><label for="liUrl">LinkedIn profile URL</label><input id="liUrl" type="url" placeholder="https://www.linkedin.com/in/your-profile" /></div>
+                <div class="field full"><label for="liText">Headline / About / featured profile text</label><textarea id="liText" placeholder="Paste headline, About section, featured description, or profile text..."></textarea></div>
+                <div class="field"><label for="followers">Followers or connections</label><input id="followers" type="number" min="0" placeholder="Example: 2500" /></div>
+                <div class="field"><label for="postsPerMonth">Posts per month</label><input id="postsPerMonth" type="number" min="0" placeholder="Example: 8" /></div>
+                <div class="field"><label for="avgReactions">Average reactions per post</label><input id="avgReactions" type="number" min="0" placeholder="Example: 45" /></div>
+                <div class="field"><label for="avgComments">Average comments per post</label><input id="avgComments" type="number" min="0" placeholder="Example: 10" /></div>
+              </div>
+
+              <div class="assessment-grid" style="margin-top:18px;" id="linkedinSliders"></div>
+              <button class="btn btn-primary btn-wide" onclick="assessLinkedIn()">Assess LinkedIn Profile</button>
+
+              <div class="result-block">
+                <div class="result-label">Optional trusted external analyzers</div>
+                <p>Static GitHub Pages cannot automatically pull results back from third-party websites. Use these as optional cross-checks, then compare with this tool's report.</p>
+                <div class="tools">
+                  <a class="tool-link" href="https://paje.ai/tools/linkedin-profile-analyzer" target="_blank" rel="noreferrer"><span>Paje LinkedIn Profile Analyzer<small>Free, browser-based profile score</small></span><span>↗</span></a>
+                  <a class="tool-link" href="https://www.socialcal.app/linkedin-profile-analyzer" target="_blank" rel="noreferrer"><span>SocialCal LinkedIn Analyzer<small>Public URL audit and quick wins</small></span><span>↗</span></a>
+                  <a class="tool-link" href="https://reepl.io/free-tools/linkedin-profile-analysis" target="_blank" rel="noreferrer"><span>Reepl Profile Analyzer<small>PDF/image upload assessment</small></span><span>↗</span></a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="results"><section class="card score-panel"><div class="card-inner">
+          <div class="master-score"><div><small>LinkedIn Signal</small><strong><span id="liTotal">0</span>/100</strong></div><div class="diamond">in</div></div>
+          <div class="mini-scores"><div class="mini"><span>Structure</span><b id="liStructure">0</b></div><div class="mini"><span>Content</span><b id="liContent">0</b></div><div class="mini"><span>Engagement</span><b id="liEngagement">0</b></div></div>
+          <div class="result-block"><div class="result-label">Profile Level</div><h3 id="liLevel">Not assessed yet</h3></div>
+          <div class="result-block"><div class="result-label">LinkedIn Evaluation</div><p id="liEvaluation">Enter your profile URL and click Assess LinkedIn Profile.</p></div>
+          <div class="result-block"><div class="result-label">Recommended Actions</div><div class="recommendations" id="liRecommendations"></div></div>
+          <button class="btn btn-primary btn-wide" onclick="exportLinkedInReport()">Export LinkedIn Report</button>
+        </div></section></aside>
+      </section>
+    </section>
+
+    <section id="brandView" class="view">
+      <div class="button-row" style="margin-bottom:18px;"><button class="btn btn-ghost" onclick="showView('homeView')">← Back</button></div>
+      <section class="layout">
+        <div class="stack">
+          <section class="card">
+            <div class="card-inner">
+              <div class="card-head"><div><h2 class="section-title">Personal Brand Assessment</h2><p class="section-kicker">Score your current brand, answer short questions, then click Show Results.</p></div><div class="badge">Brand Discovery</div></div>
+              <div class="assessment-grid" id="brandSliders"></div>
+            </div>
+          </section>
+          <section class="card"><div class="card-inner">
+            <div class="card-head"><div><h2 class="section-title">Brand Discovery Questions</h2><p class="section-kicker">Keep answers short and direct. The tool will extract signals from your input.</p></div></div>
+            <div class="assessment-grid">
+              <div class="question"><label for="audience">Who do you want to be known by?</label><input id="audience" placeholder="Example: technical training leaders, customer success executives, AI adoption teams" /></div>
+              <div class="question"><label for="expertise">What should people remember you for?</label><input id="expertise" placeholder="Example: scalable customer education, technical enablement, adoption strategy" /></div>
+              <div class="question"><label for="proof">What proof makes you credible?</label><textarea id="proof" placeholder="Example: programs launched, people trained, measurable impact, awards, business outcomes..."></textarea></div>
+              <div class="question"><label for="opportunity">What opportunity do you want your brand to attract?</label><select id="opportunity"><option value="Leadership opportunities">Leadership opportunities</option><option value="Speaking opportunities">Speaking opportunities</option><option value="Consulting opportunities">Consulting opportunities</option><option value="Career growth">Career growth</option><option value="Client acquisition">Client acquisition</option><option value="Community growth">Community growth</option></select></div>
+            </div>
+            <button class="btn btn-primary btn-wide" onclick="assessBrand()">Show Results</button>
+          </div></section>
+        </div>
+
+        <aside class="results"><section class="card score-panel"><div class="card-inner">
+          <div class="master-score"><div><small>Brand Signal</small><strong><span id="brandTotal">0</span>/100</strong></div><div class="diamond">◆</div></div>
+          <div class="mini-scores"><div class="mini"><span>Clarity</span><b id="brandClarity">0</b></div><div class="mini"><span>Proof</span><b id="brandProof">0</b></div><div class="mini"><span>Visibility</span><b id="brandVisibility">0</b></div></div>
+          <div class="result-block"><div class="result-label">Brand Level</div><h3 id="brandLevel">Not assessed yet</h3></div>
+          <div class="result-block"><div class="result-label">Positioning Feedback</div><p id="brandEvaluation">Complete the assessment and click Show Results.</p></div>
+          <div class="result-block"><div class="result-label">Recommended Actions</div><div class="recommendations" id="brandRecommendations"></div></div>
+          <button class="btn btn-primary btn-wide" onclick="exportBrandReport()">Export Brand Report</button>
+        </div></section></aside>
+      </section>
+    </section>
+
+    <footer>Created by&nbsp;<a href="https://www.linkedin.com/in/ramy-habib-782b803b" target="_blank" rel="noreferrer">Ramy Habib</a></footer>
+  </main>
+
+  <script>
+    const premiumWords = ["strategy","leadership","transformation","growth","impact","customer","technical","training","enablement","adoption","ai","data","insight","performance","scale","executive","innovation","value","experience","learning","education","consulting"];
+    const genericWords = ["hardworking","passionate","motivated","dynamic","team player","responsible","results-driven","self-starter"];
+
+    const linkedinItems = [
+      { id:"liPhoto", label:"Profile photo quality", hint:"Assess clarity, framing, lighting, professionalism, and visual confidence." },
+      { id:"liBanner", label:"Banner strength", hint:"Assess whether the banner communicates expertise, audience, or value proposition." },
+      { id:"liHeadline", label:"Headline strength", hint:"Assess whether the headline explains expertise, audience, and outcome." },
+      { id:"liAbout", label:"About section strength", hint:"Assess whether the About section tells a clear, credible, outcome-focused story." }
+    ];
+
+    const brandItems = [
+      { id:"bClarity", label:"People understand what I am known for", hint:"High score means your expertise is clear within seconds." },
+      { id:"bCredibility", label:"I can prove my value with specific achievements", hint:"High score means your brand has evidence, not only claims." },
+      { id:"bDifferentiation", label:"My brand feels distinct from similar professionals", hint:"High score means your message does not sound generic." },
+      { id:"bConsistency", label:"My message is consistent across channels", hint:"High score means LinkedIn, resume, bio, and conversations tell the same story." },
+      { id:"bVisibility", label:"I consistently share insights and show up professionally", hint:"High score means your expertise is visible and active." }
+    ];
+
+    const state = { liPhoto:5, liBanner:5, liHeadline:5, liAbout:5, bClarity:5, bCredibility:5, bDifferentiation:5, bConsistency:5, bVisibility:5 };
+    let lastLinkedInReport = "";
+    let lastBrandReport = "";
+
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function createSliders(containerId, items) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = items.map(item => `
+        <div class="slider-row">
+          <div class="slider-head"><label for="${item.id}">${item.label}</label><span class="score-pill" id="${item.id}Value">5</span></div>
+          <input id="${item.id}" type="range" min="1" max="10" value="5" />
+          <p class="hint">${item.hint}</p>
+        </div>`).join('');
+      items.forEach(item => {
+        const input = document.getElementById(item.id);
+        const value = document.getElementById(item.id + 'Value');
+        input.addEventListener('input', e => { state[item.id] = Number(e.target.value); value.textContent = state[item.id]; });
+      });
+    }
+
+    function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+    function avg(arr) { return arr.reduce((s,v) => s + Number(v || 0), 0) / arr.length; }
+    function getLevel(score) { if(score >= 86) return "Elite Authority"; if(score >= 74) return "Strong Market Signal"; if(score >= 60) return "Promising but Needs Sharpening"; if(score >= 40) return "Developing Brand"; return "Early Stage Brand"; }
+    function analyzeText(text) {
+      const lower = (text || '').toLowerCase();
+      const words = lower.match(/[a-z0-9+#.-]+/g) || [];
+      const numbers = (text || '').match(/\b\d+(?:[.,]\d+)?%?\b/g) || [];
+      const premiumHits = premiumWords.filter(w => lower.includes(w));
+      const genericHits = genericWords.filter(w => lower.includes(w));
+      return { wordCount: words.length, numbers, premiumHits, genericHits };
+    }
+    function renderRecs(id, recs) { document.getElementById(id).innerHTML = recs.map(r => `<div class="recommendation"><span>→</span><span>${r}</span></div>`).join(''); }
+
+    function assessLinkedIn() {
+      const url = document.getElementById('liUrl').value.trim();
+      const text = document.getElementById('liText').value.trim();
+      const followers = Number(document.getElementById('followers').value || 0);
+      const posts = Number(document.getElementById('postsPerMonth').value || 0);
+      const reactions = Number(document.getElementById('avgReactions').value || 0);
+      const comments = Number(document.getElementById('avgComments').value || 0);
+      const analysis = analyzeText(text);
+      const urlScore = /^https?:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9\-_%]+\/?$/.test(url) ? 100 : (url ? 45 : 0);
+      const visualScore = Math.round(avg([state.liPhoto, state.liBanner]) * 10);
+      const structureScore = Math.round((urlScore * .25) + (visualScore * .35) + (state.liHeadline * 10 * .25) + (state.liAbout * 10 * .15));
+      const contentBonus = clamp(analysis.premiumHits.length * 4 + analysis.numbers.length * 6 - analysis.genericHits.length * 7, -18, 24);
+      const textDepth = clamp(analysis.wordCount / 1.5, 0, 100);
+      const contentScore = clamp(Math.round((state.liHeadline * 10 * .30) + (state.liAbout * 10 * .35) + (textDepth * .20) + contentBonus), 0, 100);
+      const frequencyScore = clamp(posts * 10, 0, 100);
+      const engagementRate = followers > 0 ? ((reactions + comments) / followers) * 100 : 0;
+      const rateScore = clamp(engagementRate * 18, 0, 100);
+      const conversationScore = clamp(comments * 6, 0, 100);
+      const engagementScore = Math.round(frequencyScore * .30 + rateScore * .45 + conversationScore * .25);
+      const total = Math.round(structureScore * .35 + contentScore * .40 + engagementScore * .25);
+
+      document.getElementById('liTotal').textContent = total;
+      document.getElementById('liStructure').textContent = structureScore;
+      document.getElementById('liContent').textContent = contentScore;
+      document.getElementById('liEngagement').textContent = engagementScore;
+      document.getElementById('liLevel').textContent = getLevel(total);
+
+      const proof = analysis.numbers.length ? "The profile text includes measurable proof, which improves credibility." : "The profile text needs measurable proof such as percentage growth, audience size, delivery scale, revenue impact, or time saved.";
+      const authority = analysis.premiumHits.length >= 5 ? "The language has strong authority signals." : "The language needs stronger authority signals tied to expertise, audience, and outcomes.";
+      const engagement = engagementScore >= 70 ? "Engagement appears healthy based on the metrics entered." : "Engagement needs a stronger rhythm through consistent posting and more conversation-driven content.";
+      document.getElementById('liEvaluation').textContent = `${proof} ${authority} ${engagement}`;
+
+      const recs = [];
+      if(!url) recs.push("Add a LinkedIn profile URL before running the assessment.");
+      if(url && urlScore < 100) recs.push("Check the LinkedIn URL format. A strong public URL usually looks like https://www.linkedin.com/in/your-name.");
+      if(state.liPhoto < 7) recs.push("Upgrade the profile photo for clarity, premium framing, and professional quality.");
+      if(state.liBanner < 7) recs.push("Use the banner as brand real estate: add your expertise, audience, or signature value proposition.");
+      if(state.liHeadline < 7) recs.push("Rewrite the headline around value: who you help, what you help with, and the outcome you create.");
+      if(state.liAbout < 7 || analysis.wordCount < 80) recs.push("Strengthen the About section with a compact story, proof, specialties, and a clear call-to-action.");
+      if(!analysis.numbers.length) recs.push("Add measurable outcomes to increase trust and conversion-readiness.");
+      if(engagementScore < 55) recs.push("Improve engagement with a monthly content rhythm: point of view, proof story, practical lesson, and industry insight.");
+      if(analysis.genericHits.length) recs.push("Replace generic language such as " + analysis.genericHits.join(', ') + " with specific expertise and evidence.");
+      if(!recs.length) recs.push("Strong LinkedIn foundation. Next step: refine your signature message and publish consistently around 3-4 content pillars.");
+      renderRecs('liRecommendations', recs);
+
+      lastLinkedInReport = `LinkedIn Profile Assessment\n\nScore: ${total}/100\nLevel: ${getLevel(total)}\nStructure: ${structureScore}/100\nContent: ${contentScore}/100\nEngagement: ${engagementScore}/100\nURL: ${url || 'Not provided'}\n\nEvaluation:\n${document.getElementById('liEvaluation').textContent}\n\nRecommendations:\n${recs.map(r => '- ' + r).join('\n')}\n\nCreated by Ramy Habib\nLinkedIn: https://www.linkedin.com/in/ramy-habib-782b803b`;
+    }
+
+    function assessBrand() {
+      const audience = document.getElementById('audience').value.trim();
+      const expertise = document.getElementById('expertise').value.trim();
+      const proof = document.getElementById('proof').value.trim();
+      const opportunity = document.getElementById('opportunity').value;
+      const analysis = analyzeText(`${audience} ${expertise} ${proof} ${opportunity}`);
+      const clarityScore = Math.round(state.bClarity * 10);
+      const proofScore = clamp(Math.round((state.bCredibility * 10 * .65) + (analysis.numbers.length * 8) + (proof.length > 80 ? 12 : 0)), 0, 100);
+      const visibilityScore = Math.round(state.bVisibility * 10);
+      const differentiationScore = Math.round(state.bDifferentiation * 10);
+      const consistencyScore = Math.round(state.bConsistency * 10);
+      const signalBonus = clamp(analysis.premiumHits.length * 3 - analysis.genericHits.length * 6, -15, 18);
+      const total = clamp(Math.round(clarityScore * .24 + proofScore * .24 + differentiationScore * .20 + consistencyScore * .14 + visibilityScore * .18 + signalBonus), 0, 100);
+
+      document.getElementById('brandTotal').textContent = total;
+      document.getElementById('brandClarity').textContent = clarityScore;
+      document.getElementById('brandProof').textContent = proofScore;
+      document.getElementById('brandVisibility').textContent = visibilityScore;
+      document.getElementById('brandLevel').textContent = getLevel(total);
+
+      const positioning = audience && expertise
+        ? `Your current positioning can be framed as: “I help ${audience} achieve stronger outcomes through ${expertise}.” Your target opportunity is ${opportunity.toLowerCase()}.`
+        : "Your brand needs clearer positioning. Define who you help, what you help with, and the outcome you create.";
+      const proofMsg = analysis.numbers.length ? "Your proof includes measurable signals, which strengthens trust." : "Your proof still needs numbers or concrete outcomes to become more credible.";
+      document.getElementById('brandEvaluation').textContent = `${positioning} ${proofMsg}`;
+
+      const recs = [];
+      if(!audience) recs.push("Define a specific audience. Avoid saying everyone; choose the people who should remember you first.");
+      if(!expertise) recs.push("Name your signature expertise in simple language so your value is easy to repeat.");
+      if(state.bClarity < 7) recs.push("Sharpen your one-line positioning: audience + expertise + outcome.");
+      if(state.bCredibility < 7 || !analysis.numbers.length) recs.push("Add proof: metrics, achievements, programs delivered, adoption growth, customer impact, or business outcomes.");
+      if(state.bDifferentiation < 7) recs.push("Build a signature angle that separates your point of view from similar professionals.");
+      if(state.bConsistency < 7) recs.push("Align LinkedIn, resume, bio, intros, and content around the same message.");
+      if(state.bVisibility < 7) recs.push("Increase visibility with weekly content pillars: point of view, proof story, practical framework, and leadership lesson.");
+      if(analysis.genericHits.length) recs.push("Remove generic phrases such as " + analysis.genericHits.join(', ') + " and replace them with sharper, evidence-based language.");
+      if(!recs.length) recs.push("Strong brand foundation. Next step: package your expertise into a memorable signature framework and publish consistently.");
+      renderRecs('brandRecommendations', recs);
+
+      lastBrandReport = `Personal Brand Assessment\n\nScore: ${total}/100\nLevel: ${getLevel(total)}\nClarity: ${clarityScore}/100\nProof: ${proofScore}/100\nVisibility: ${visibilityScore}/100\nAudience: ${audience || 'Not provided'}\nExpertise: ${expertise || 'Not provided'}\nOpportunity: ${opportunity}\n\nFeedback:\n${document.getElementById('brandEvaluation').textContent}\n\nRecommendations:\n${recs.map(r => '- ' + r).join('\n')}\n\nCreated by Ramy Habib\nLinkedIn: https://www.linkedin.com/in/ramy-habib-782b803b`;
+    }
+
+    function downloadText(filename, content) {
+      const blob = new Blob([content], { type:'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+    }
+    function exportLinkedInReport() { if(!lastLinkedInReport) assessLinkedIn(); downloadText('linkedin-profile-assessment.txt', lastLinkedInReport); }
+    function exportBrandReport() { if(!lastBrandReport) assessBrand(); downloadText('personal-brand-assessment.txt', lastBrandReport); }
+
+    createSliders('linkedinSliders', linkedinItems);
+    createSliders('brandSliders', brandItems);
+  </script>
+</body>
+</html>
