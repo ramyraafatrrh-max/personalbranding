@@ -1,0 +1,220 @@
+import React, { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Crown, Sparkles, Linkedin, BarChart3, Target, Download, ArrowRight, ShieldCheck, UserRound, MessageSquareText, Gem } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+const questions = [
+  { id: "audience", label: "Who is your ideal audience?", placeholder: "Executives, recruiters, founders, learning leaders..." },
+  { id: "expertise", label: "What topics do people come to you for?", placeholder: "Training strategy, technical enablement, customer education..." },
+  { id: "proof", label: "What measurable wins prove your credibility?", placeholder: "Revenue impact, adoption growth, program launches, awards..." },
+  { id: "values", label: "What values should your brand radiate?", placeholder: "Precision, trust, innovation, empathy, excellence..." },
+  { id: "tone", label: "What tone feels most authentic?", placeholder: "Elite, warm, strategic, bold, analytical..." },
+  { id: "goal", label: "What opportunity should your brand attract?", placeholder: "Speaking, leadership role, consulting, community growth..." },
+];
+
+const premiumWords = ["strategy", "leadership", "innovation", "growth", "transformation", "enablement", "customer", "technical", "training", "ai", "data", "impact", "executive", "trust", "scale", "adoption", "value", "insight", "experience", "performance"];
+const weakWords = ["hardworking", "passionate", "motivated", "responsible", "team player", "results-driven", "dynamic"];
+
+function scoreText(text) {
+  const words = text.toLowerCase().match(/[a-z0-9+#.-]+/g) || [];
+  const unique = new Set(words);
+  const premiumHits = premiumWords.filter((w) => text.toLowerCase().includes(w));
+  const weakHits = weakWords.filter((w) => text.toLowerCase().includes(w));
+  const numbers = text.match(/\b\d+(?:[.,]\d+)?%?\b/g) || [];
+  const clarity = Math.min(100, Math.round((unique.size / Math.max(words.length, 1)) * 130));
+  const authority = Math.min(100, premiumHits.length * 9 + numbers.length * 8 + Math.min(words.length, 140) * 0.25);
+  const differentiation = Math.max(20, Math.min(100, 55 + premiumHits.length * 4 + numbers.length * 7 - weakHits.length * 8));
+  const overall = Math.round(clarity * 0.28 + authority * 0.38 + differentiation * 0.34);
+  return { overall, clarity, authority: Math.round(authority), differentiation, premiumHits, weakHits, numbers, wordCount: words.length };
+}
+
+function buildPositioning(form, linkedinText, metrics) {
+  const expertise = form.expertise || "high-value expertise";
+  const audience = form.audience || "the right audience";
+  const proof = form.proof || "credible outcomes";
+  const values = form.values || "clarity, trust, and excellence";
+  const goal = form.goal || "premium opportunities";
+  const tone = form.tone || "strategic and polished";
+
+  return {
+    headline: `${expertise.split(",")[0].trim()} for ${audience.split(",")[0].trim()}`,
+    promise: `I help ${audience} achieve stronger outcomes through ${expertise}, grounded in ${proof}.`,
+    archetype: metrics.authority > 70 ? "The Trusted Authority" : metrics.differentiation > 72 ? "The Distinctive Specialist" : "The Strategic Builder",
+    narrative: `Your brand should feel ${tone}, signal ${values}, and consistently connect your expertise to the opportunity you want next: ${goal}.`,
+    linkedinSummary: linkedinText.length > 60 ? "Your LinkedIn profile has enough material for analysis. Strengthen it by making impact metrics, audience, and signature expertise visible in the first 3 lines." : "Paste your LinkedIn About/headline/experience text to unlock a sharper profile assessment.",
+  };
+}
+
+export default function PersonalBrandDiscoveryTool() {
+  const [form, setForm] = useState({ audience: "", expertise: "", proof: "", values: "", tone: "", goal: "" });
+  const [linkedinText, setLinkedinText] = useState("");
+  const combined = `${Object.values(form).join(" ")} ${linkedinText}`;
+  const metrics = useMemo(() => scoreText(combined), [combined]);
+  const brand = useMemo(() => buildPositioning(form, linkedinText, metrics), [form, linkedinText, metrics]);
+
+  const recommendations = [
+    metrics.numbers.length === 0 ? "Add quantified proof: %, revenue, adoption, learner count, delivery scale, satisfaction, or time saved." : "You are using measurable proof — keep those numbers visible in your headline/About section.",
+    metrics.weakHits.length > 0 ? `Replace generic terms like ${metrics.weakHits.join(", ")} with sharper evidence-based language.` : "Your language avoids many generic clichés — good foundation for an elite positioning.",
+    metrics.premiumHits.length < 5 ? "Increase authority signals by naming strategic domains, industries, tools, outcomes, and audience types." : "Strong authority vocabulary detected — refine it into one memorable signature message.",
+    "Create a repeatable content pillar system: point of view, proof story, practical framework, and executive insight.",
+  ];
+
+  const setField = (id, value) => setForm((prev) => ({ ...prev, [id]: value }));
+
+  const exportReport = () => {
+    const report = `Personal Brand Discovery Report\n\nScore: ${metrics.overall}/100\nArchetype: ${brand.archetype}\nHeadline: ${brand.headline}\nPromise: ${brand.promise}\nNarrative: ${brand.narrative}\n\nInsights:\n- Clarity: ${metrics.clarity}/100\n- Authority: ${metrics.authority}/100\n- Differentiation: ${metrics.differentiation}/100\n\nRecommendations:\n${recommendations.map((r) => `- ${r}`).join("\n")}\n\nCreated by Ramy Habib\nLinkedIn: https://www.linkedin.com/in/ramy-habib-782b803b`;
+    const blob = new Blob([report], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "personal-brand-discovery-report.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#06040d] text-white overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#7c3aed55,transparent_33%),radial-gradient(circle_at_top_right,#d4af3755,transparent_28%),linear-gradient(135deg,#06040d,#111827_55%,#050505)]" />
+      <div className="relative mx-auto max-w-7xl px-5 py-8 md:py-12">
+        <nav className="flex items-center justify-between mb-10">
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-amber-300 to-violet-500 flex items-center justify-center shadow-2xl shadow-violet-500/30">
+              <Crown className="h-6 w-6 text-black" />
+            </div>
+            <div>
+              <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">Elite Brand Lab</p>
+              <h1 className="text-xl font-semibold">Personal Brand Discovery</h1>
+            </div>
+          </div>
+          https://www.linkedin.com/in/ramy-habib-782b803b
+        </nav>
+
+        <section className="grid lg:grid-cols-[1.05fr_0.95fr] gap-7 items-start">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <div className="mb-7">
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-white/5 px-4 py-2 text-sm text-amber-100 mb-5">
+                <Sparkles className="h-4 w-4" /> AI-style guided assessment prototype for GitHub
+              </div>
+              <h2 className="text-5xl md:text-6xl font-semibold tracking-tight leading-tight">
+                Discover the brand people should remember.
+              </h2>
+              <p className="mt-5 text-lg text-slate-300 max-w-2xl">
+                Answer a few strategic questions, paste LinkedIn profile text, and receive a premium positioning snapshot with insight extraction, scoring, and recommendations.
+              </p>
+            </div>
+
+            <Card className="rounded-[2rem] border-white/10 bg-white/[0.06] backdrop-blur-xl shadow-2xl shadow-black/30">
+              <CardContent className="p-5 md:p-7">
+                <div className="flex items-center gap-3 mb-6">
+                  <UserRound className="text-amber-200" />
+                  <h3 className="text-2xl font-semibold text-white">Brand Assessment</h3>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {questions.map((q) => (
+                    <label key={q.id} className="block">
+                      <span className="text-sm text-slate-300">{q.label}</span>
+                      <textarea
+                        value={form[q.id]}
+                        onChange={(e) => setField(q.id, e.target.value)}
+                        placeholder={q.placeholder}
+                        className="mt-2 min-h-[92px] w-full rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white placeholder:text-slate-500 outline-none focus:border-amber-300/60 focus:ring-2 focus:ring-amber-300/10"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mt-5 rounded-[2rem] border-white/10 bg-white/[0.06] backdrop-blur-xl shadow-2xl shadow-black/30">
+              <CardContent className="p-5 md:p-7">
+                <div className="flex items-center gap-3 mb-4">
+                  <Linkedin className="text-sky-300" />
+                  <h3 className="text-2xl font-semibold text-white">LinkedIn Profile Assessment</h3>
+                </div>
+                <p className="text-sm text-slate-400 mb-3">Paste your LinkedIn headline, About section, and selected experience text. This prototype analyzes user-provided text locally.</p>
+                <textarea
+                  value={linkedinText}
+                  onChange={(e) => setLinkedinText(e.target.value)}
+                  placeholder="Example: Senior Advisor in Customer/Technical Training helping teams accelerate adoption through scalable learning experiences..."
+                  className="min-h-[170px] w-full rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white placeholder:text-slate-500 outline-none focus:border-sky-300/60 focus:ring-2 focus:ring-sky-300/10"
+                />
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.aside initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }} className="lg:sticky lg:top-6">
+            <Card className="rounded-[2rem] border-amber-200/20 bg-gradient-to-br from-white/[0.12] to-white/[0.04] backdrop-blur-xl shadow-2xl shadow-amber-900/20">
+              <CardContent className="p-6 md:p-8">
+                <div className="flex items-start justify-between gap-4 mb-7">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.28em] text-amber-200">Brand Signal</p>
+                    <h3 className="text-3xl font-semibold mt-2">{metrics.overall}/100</h3>
+                  </div>
+                  <div className="h-16 w-16 rounded-3xl bg-amber-300 text-black flex items-center justify-center shadow-xl shadow-amber-500/30">
+                    <Gem className="h-8 w-8" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 mb-7">
+                  {[
+                    ["Clarity", metrics.clarity],
+                    ["Authority", metrics.authority],
+                    ["Distinct", metrics.differentiation],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-2xl bg-black/25 border border-white/10 p-3">
+                      <p className="text-xs text-slate-400">{label}</p>
+                      <p className="text-xl font-semibold">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  <div className="rounded-3xl bg-black/30 border border-white/10 p-5">
+                    <div className="flex items-center gap-2 text-amber-100 mb-2"><Target className="h-4 w-4" /> Archetype</div>
+                    <p className="text-2xl font-semibold">{brand.archetype}</p>
+                  </div>
+                  <div className="rounded-3xl bg-black/30 border border-white/10 p-5">
+                    <div className="flex items-center gap-2 text-violet-100 mb-2"><MessageSquareText className="h-4 w-4" /> Positioning Promise</div>
+                    <p className="text-slate-100 leading-relaxed">{brand.promise}</p>
+                  </div>
+                  <div className="rounded-3xl bg-black/30 border border-white/10 p-5">
+                    <div className="flex items-center gap-2 text-sky-100 mb-2"><BarChart3 className="h-4 w-4" /> Extracted Insights</div>
+                    <ul className="text-sm text-slate-300 space-y-2">
+                      <li>Word count analyzed: <span className="text-white font-medium">{metrics.wordCount}</span></li>
+                      <li>Authority signals: <span className="text-white font-medium">{metrics.premiumHits.length ? metrics.premiumHits.join(", ") : "None yet"}</span></li>
+                      <li>Proof metrics found: <span className="text-white font-medium">{metrics.numbers.length ? metrics.numbers.join(", ") : "None yet"}</span></li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h4 className="flex items-center gap-2 text-lg font-semibold mb-3"><ShieldCheck className="h-5 w-5 text-emerald-300" /> Recommendations</h4>
+                  <div className="space-y-3">
+                    {recommendations.map((r, i) => (
+                      <div key={i} className="flex gap-3 rounded-2xl bg-white/[0.06] border border-white/10 p-4 text-sm text-slate-200">
+                        <ArrowRight className="h-4 w-4 text-amber-200 mt-0.5 shrink-0" />
+                        <span>{r}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Button onClick={exportReport} className="mt-7 w-full rounded-2xl bg-gradient-to-r from-amber-300 to-violet-400 text-black hover:opacity-95 shadow-xl shadow-violet-900/20">
+                  <Download className="h-4 w-4 mr-2" /> Export Brand Report
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.aside>
+        </section>
+
+        <footer className="relative mt-10 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6 text-sm text-slate-400">
+          <p>Created by <span className="text-amber-200 font-semibold">Ramy Habib</span></p>
+          <a href="https://www.linkedin.com/in/ramy-habib-782b803b" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-white hover:bg-white/10">
+            <Linkedin className="h-4 w-4" /> Access my LinkedIn profile
+          </a>
+        </footer>
+      </div>
+    </div>
+  );
+}
